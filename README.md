@@ -12,3 +12,6 @@ Place propban.lua in lua/sam/modules
 Uses SetNWInt("PropBanEndTime", 0), So you can use GetNWInt("PropBanEndTime") on huds or other things to show a display if you are prop banned.
 
 view https://ronnyg.xyz to contact me
+
+### SAM | Admin Mod
+https://www.gmodstore.com/market/view/sam
