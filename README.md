@@ -9,6 +9,7 @@ Place propban.lua in lua/sam/modules
 !unpropban user/steamid
 
 ## Other information
+### About the module
 Uses SetNWInt("PropBanEndTime", 0), So you can use GetNWInt("PropBanEndTime") on huds or other things to show a display if you are prop banned. Bad practice? i dont know. It works and it useful for hud displays.
 
 view https://ronnyg.xyz to contact me
