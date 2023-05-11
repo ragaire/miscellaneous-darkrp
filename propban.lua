@@ -25,11 +25,16 @@ sam.command.new("propban")
     :SetCategory("Utility")
     :SetPermission("propban", "admin")
     :AddArg("player")
-    :AddArg("length", { optional = true, default = 0, min = 0 })
+    :AddArg("length", { optional = false, default = 0, min = 1 }) -- Minimum ban length of 1
     :AddArg("text", {hint = "reason", optional = true, default = sam.language.get("default_reason")})
     :GetRestArgs()
     :Help("Ban a player from spawning props.")
     :OnExecute(function(ply, targets, length, reason)
+        if length <= 0 then
+            sam.player.send_message(ply, "Ban length must be greater than 0.") -- Inform the admin that ban length must be greater than 0
+            return
+        end
+
         for i = 1, #targets do
             local target = targets[i]
             PropBan(target, length * 60)
@@ -41,6 +46,7 @@ sam.command.new("propban")
         })
     end)
 :End()
+
 
 -- !unpropban command
 sam.command.new("unpropban")
