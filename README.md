@@ -13,5 +13,7 @@ Place propban.lua in lua/sam/modules
 https://www.gmodstore.com/market/view/sam
 
 ## Credits
-ragaire - Original code
 Luiggi33 - Improvements
+
+ragaire - Original code
+
