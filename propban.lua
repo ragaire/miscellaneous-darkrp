@@ -1,23 +1,34 @@
--- prop ban function
-local function PropBan(target, banTime)
-    if not IsValid(target) then return end
+local SAM_PropBans = {}
 
-    target:SetNWInt("PropBanEndTime", os.time() + banTime)
+-- prop ban function
+function SAM_PropBan(target, banTime)
+    if not IsValid(target) then return end
+    banTime = banTime or 0
+    banTime = banTime > 0 and CurTime() + banTime or math.huge
+
+    if SAM_PropBans[target] and SAM_PropBans[target] >= banTime then return end
+
+    SAM_PropBans[target] = banTime
 end
 
 -- prop unban function
-local function UnpropBan(target)
+function SAM_UnpropBan(target)
     if not IsValid(target) then return end
 
-    target:SetNWInt("PropBanEndTime", 0)
+    SAM_PropBans[target] = nil
 end
 
--- PlayerSpawnProp hook to prevent spawning props for banned players
-hook.Add("PlayerSpawnProp", "PropBanCheck", function(ply, model)
-    if ply:GetNWInt("PropBanEndTime", 0) > os.time() then
+-- PlayerSpawnObject hook to prevent spawning objects for banned players
+hook.Add("PlayerSpawnObject", "PropBanCheck", function(ply, model)
+    if SAM_PropBans[ply] and SAM_PropBans[ply] > CurTime() then
         ply:ChatPrint("You are currently banned from spawning props.")
-        return false -- Prevent prop spawning if player is prop banned
+        return false -- Prevent object spawning if player is banned
     end
+end)
+
+-- Clear the table if the player becomes invalid
+hook.Add("PlayerDisconnected", "ClearPropBanCache", function(ply)
+    SAM_PropBans[ply] = nil
 end)
 
 -- !propban command
@@ -25,24 +36,19 @@ sam.command.new("propban")
     :SetCategory("Utility")
     :SetPermission("propban", "admin")
     :AddArg("player")
-    :AddArg("length", { optional = false, default = 0, min = 1 }) -- Minimum ban length of 1
-    :AddArg("text", {hint = "reason", optional = true, default = sam.language.get("default_reason")})
+    :AddArg("length", { hint = "length, 0 for permanent", optional = false, default = 0 })
+    :AddArg("text", { hint = "reason", optional = true, default = sam.language.get("default_reason") })
     :GetRestArgs()
     :Help("Ban a player from spawning props.")
     :OnExecute(function(ply, targets, length, reason)
-        if length <= 0 then
-            sam.player.send_message(ply, "Ban length must be greater than 0.") -- Inform the admin that ban length must be greater than 0
-            return
-        end
-
         for i = 1, #targets do
             local target = targets[i]
-            PropBan(target, length * 60)
+            SAM_PropBan(target, length * 60)
         end
 
         if sam.is_command_silent then return end
-        sam.player.send_message(nil, "{A} propbanned {T} for {V}. Reason: {V_2}", {
-            A = ply, T = targets, V = sam.format_length(length), V_2 = reason
+        sam.player.send_message(nil, "{A} banned {T} from spawning props for {V}. Reason: {V_2}", {
+            A = ply, T = targets, V = length <= 0 and "ever" or sam.format_length(length), V_2 = reason
         })
     end)
 :End()
@@ -57,11 +63,11 @@ sam.command.new("unpropban")
     :OnExecute(function(ply, targets)
         for i = 1, #targets do
             local target = targets[i]
-            UnpropBan(target)
+            SAM_UnpropBan(target)
         end
 
         if sam.is_command_silent then return end
-        sam.player.send_message(nil, "{A} unbanned {T} from spawning props.", {
+        sam.player.send_message(nil, "{A} allowed {T} to spawn props again.", {
             A = ply, T = targets
         })
     end)
