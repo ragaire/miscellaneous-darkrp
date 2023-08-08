@@ -1,5 +1,12 @@
 local SAM_PropBans = {}
 
+-- get prop ban function
+function SAM_GetPropBan(target)
+    if not IsValid(target) then return end
+
+    return SAM_PropBans[target] and SAM_PropBans[target] or false
+end
+
 -- prop ban function
 function SAM_PropBan(target, banTime)
     if not IsValid(target) then return end
@@ -36,7 +43,7 @@ sam.command.new("propban")
     :SetCategory("Utility")
     :SetPermission("propban", "admin")
     :AddArg("player")
-    :AddArg("length", { hint = "length, 0 for permanent", optional = false, default = 0 })
+    :AddArg("length", { hint = "length, 0 for permanent", optional = false, min = 0, default = 0 })
     :AddArg("text", { hint = "reason", optional = true, default = sam.language.get("default_reason") })
     :GetRestArgs()
     :Help("Ban a player from spawning props.")
