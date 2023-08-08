@@ -6,6 +6,7 @@ Place propban.lua in lua/sam/modules
 
 ## In-Game Usage:
 !propban user/steamid time reason
+
 !unpropban user/steamid
 
 ## Other information
